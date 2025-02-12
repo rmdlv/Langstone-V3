@@ -17,7 +17,7 @@ mkfifo /tmp/langstoneTRx
 if !(ps -ax |grep -v grep| grep -q Lang_TRX_Pluto.py) then
    sudo amixer  cset numid=6 100%  > /dev/null 2>&1
    sudo amixer  cset numid=8 50%  > /dev/null 2>&1
-   sudo cp /home/pi/Langstone/splashload_Pluto.bgra /dev/fb0
+   sudo cp /home/pi/Langstone/splashload.bgra /dev/fb0
    
    retry=0
    until [ ${retry} -ge 4 ]
