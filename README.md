@@ -16,7 +16,9 @@ Currently only the following hardware is supported:-
 
 - Raspberry Pi 5
 
-- Official Raspberry Pi 7" touchscreen
+- Official Original Raspberry Pi 7" touchscreen.
+
+- RPi5 to Touchscreen flat cable. (this will need to be purchased seperately as the cable supplied with the Touch Screen is not suitable)
 
 - Adalm Pluto SDR Module
 
@@ -24,7 +26,6 @@ Currently only the following hardware is supported:-
  
 - USB Scroll mouse
  
-
 - PTT via Raspberry Pi GPIO 17 (pin 11). This needs a pull up resistor to 3.3V. Grounding this pin will switch to Transmit.
 
 - CW Key is via Raspberry Pi GPIO 18 (pin 12). This needs a pull up resistor to 3.3V. Grounding this pin will key the transmitter. 
@@ -61,7 +62,9 @@ The preferred installation method only needs a Windows PC connected to the same 
 
 - Insert your micro SD card into a card reader and select that device for the Storage.  Note:- Ignore and close any message boxes about reformatting the drive. This is not needed. 
 
-- When asked 'Use OS customisation' Select 'EDIT SETTINGS' then select 'Services' make sure that 'Enable SSH' is ticked and 'Use password authentication' is selected. 
+- When asked 'Use OS customisation' Select 'EDIT SETTINGS' then select 'Services' make sure that 'Enable SSH' is ticked and 'Use password authentication' is selected.
+
+- If you are required to set the username and password use pi and raspberry. 
 
 - Click Save, then click 'YES' to start writing the SD card.
 
