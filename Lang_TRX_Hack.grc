@@ -440,7 +440,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [160, 904]
+    coordinate: [136, 868.0]
     rotation: 0
     state: enabled
 - name: analog_sig_source_x_1_0
@@ -1210,9 +1210,9 @@ blocks:
     affinity: ''
     alias: ''
     comment: ''
-    decim: '1'
+    decim: '3'
     fbw: '0'
-    interp: '165'
+    interp: '500'
     maxoutbuf: '0'
     minoutbuf: '0'
     taps: ''
@@ -1230,9 +1230,9 @@ blocks:
     affinity: ''
     alias: ''
     comment: ''
-    decim: '15'
+    decim: '500'
     fbw: '0'
-    interp: '1'
+    interp: '33'
     maxoutbuf: '0'
     minoutbuf: '0'
     taps: '[]'
@@ -1254,7 +1254,7 @@ blocks:
     center_freq: Tx_LO
     comment: ''
     dev_args: ''
-    samp_rate: '7920000'
+    samp_rate: '8000000'
     type: fc32
     vga: 47-Tx_Gain
   states:
@@ -1277,7 +1277,7 @@ blocks:
     gain: Rx_Gain
     maxoutbuf: '0'
     minoutbuf: '0'
-    samp_rate: '7920000'
+    samp_rate: '8000000'
     type: fc32
     vga: '16'
   states:

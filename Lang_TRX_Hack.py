@@ -70,7 +70,7 @@ class Lang_TRX_Hack(gr.top_block):
 
         self.soapy_hackrf_source_0 = soapy.source(dev, "fc32", 1, '',
                                   stream_args, tune_args, settings)
-        self.soapy_hackrf_source_0.set_sample_rate(0, 7920000)
+        self.soapy_hackrf_source_0.set_sample_rate(0, 8000000)
         self.soapy_hackrf_source_0.set_bandwidth(0, 0)
         self.soapy_hackrf_source_0.set_frequency(0, Rx_LO)
         self.soapy_hackrf_source_0.set_gain(0, 'AMP', True)
@@ -84,19 +84,19 @@ class Lang_TRX_Hack(gr.top_block):
 
         self.soapy_hackrf_sink_0 = soapy.sink(dev, "fc32", 1, '',
                                   stream_args, tune_args, settings)
-        self.soapy_hackrf_sink_0.set_sample_rate(0, 7920000)
+        self.soapy_hackrf_sink_0.set_sample_rate(0, 8000000)
         self.soapy_hackrf_sink_0.set_bandwidth(0, 0)
         self.soapy_hackrf_sink_0.set_frequency(0, Tx_LO)
         self.soapy_hackrf_sink_0.set_gain(0, 'AMP', True)
         self.soapy_hackrf_sink_0.set_gain(0, 'VGA', min(max((47-Tx_Gain), 0.0), 47.0))
         self.rational_resampler_xxx_1 = filter.rational_resampler_ccc(
-                interpolation=1,
-                decimation=15,
+                interpolation=33,
+                decimation=500,
                 taps=[],
                 fractional_bw=0)
         self.rational_resampler_xxx_0 = filter.rational_resampler_ccc(
-                interpolation=165,
-                decimation=1,
+                interpolation=500,
+                decimation=3,
                 taps=[],
                 fractional_bw=0)
         self.network_udp_sink_1 = network.udp_sink(gr.sizeof_float, 1, '127.0.0.1', 7474, 0, 2048, False)
@@ -207,7 +207,8 @@ class Lang_TRX_Hack(gr.top_block):
         	max_dev=5e3,
           )
         self.analog_const_source_x_0 = analog.sig_source_f(0, analog.GR_CONST_WAVE, 0, 0, 0)
-        self.analog_agc3_xx_0 = analog.agc3_cc((1e-2), (5e-7), 0.1, 1.0, 1, 1000)
+        self.analog_agc3_xx_0 = analog.agc3_cc((1e-2), (5e-7), 0.1, 1.0, 1)
+        self.analog_agc3_xx_0.set_max_gain(1000)
 
 
         ##################################################
@@ -427,7 +428,6 @@ class Lang_TRX_Hack(gr.top_block):
         self.AFGain = AFGain
         self.blocks_multiply_const_vxx_1.set_k(((self.AFGain/100.0) *  (not self.Rx_Mute)))
 
-
 def docommands(tb):
   try:
     os.mkfifo("/tmp/langstoneTRx")
@@ -518,13 +518,14 @@ def docommands(tb):
          break
 
 
+
 def main(top_block_cls=Lang_TRX_Hack, options=None):
     tb = top_block_cls()
     tb.start()
     docommands(tb)
     tb.stop()
     tb.wait()
-    
-    
+
+
 if __name__ == '__main__':
     main()
