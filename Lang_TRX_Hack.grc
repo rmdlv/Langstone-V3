@@ -129,6 +129,18 @@ blocks:
     coordinate: [736, 804]
     rotation: 0
     state: enabled
+- name: RATE
+  id: variable
+  parameters:
+    comment: ''
+    value: '0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1472, 804.0]
+    rotation: 0
+    state: enabled
 - name: RxOffset
   id: variable
   parameters:
@@ -174,7 +186,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [376, 12]
+    coordinate: [392, 12.0]
     rotation: 0
     state: enabled
 - name: Rx_LO
@@ -499,7 +511,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [8, 1036]
+    coordinate: [8, 1324.0]
     rotation: 0
     state: enabled
 - name: band_pass_filter_0
@@ -834,7 +846,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [224, 1012]
+    coordinate: [192, 1012.0]
     rotation: 0
     state: enabled
 - name: blocks_multiply_const_vxx_1
@@ -942,7 +954,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1144, 1004]
+    coordinate: [1192, 1020.0]
     rotation: 0
     state: enabled
 - name: blocks_multiply_const_vxx_4
@@ -995,7 +1007,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1472, 1176]
+    coordinate: [1504, 1160.0]
     rotation: 0
     state: enabled
 - name: blocks_null_sink_0
@@ -1012,7 +1024,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [2056, 1192.0]
+    coordinate: [2288, 1200.0]
     rotation: 0
     state: enabled
 - name: blocks_selector_0
@@ -1035,7 +1047,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1816, 1172.0]
+    coordinate: [1976, 1180.0]
     rotation: 0
     state: enabled
 - name: blocks_vector_to_stream_0
@@ -1091,7 +1103,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [216, 300.0]
+    coordinate: [208, 428.0]
     rotation: 0
     state: enabled
 - name: logpwrfft_x_0
@@ -1164,6 +1176,42 @@ blocks:
     coordinate: [1520, 256]
     rotation: 0
     state: enabled
+- name: mmse_resampler_xx_0
+  id: mmse_resampler_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    phase_shift: '0'
+    resamp_ratio: 48/(8000 + 100*RATE)
+    type: complex
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1760, 1160.0]
+    rotation: 0
+    state: enabled
+- name: mmse_resampler_xx_1
+  id: mmse_resampler_xx
+  parameters:
+    affinity: ''
+    alias: 48/49
+    comment: ''
+    maxoutbuf: '8192'
+    minoutbuf: '4096'
+    phase_shift: '0'
+    resamp_ratio: 480/481
+    type: float
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [16, 1064.0]
+    rotation: 0
+    state: enabled
 - name: network_udp_sink_0
   id: network_udp_sink
   parameters:
@@ -1204,26 +1252,6 @@ blocks:
     coordinate: [1992, 1516.0]
     rotation: 0
     state: true
-- name: rational_resampler_xxx_0
-  id: rational_resampler_xxx
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    decim: '3'
-    fbw: '0'
-    interp: '500'
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    taps: ''
-    type: ccc
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [1608, 1168]
-    rotation: 0
-    state: enabled
 - name: rational_resampler_xxx_1
   id: rational_resampler_xxx
   parameters:
@@ -1241,7 +1269,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [104, 188.0]
+    coordinate: [176, 204.0]
     rotation: 0
     state: enabled
 - name: soapy_hackrf_sink_0
@@ -1256,12 +1284,12 @@ blocks:
     dev_args: ''
     samp_rate: '8000000'
     type: fc32
-    vga: 47-Tx_Gain
+    vga: Tx_Gain
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [2072, 1272.0]
+    coordinate: [2224, 1248.0]
     rotation: 0
     state: enabled
 - name: soapy_hackrf_source_0
@@ -1284,7 +1312,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [24, 108.0]
+    coordinate: [0, 100.0]
     rotation: 0
     state: enabled
 
@@ -1298,8 +1326,7 @@ connections:
 - [analog_sig_source_x_0, '0', blocks_multiply_xx_0, '1']
 - [analog_sig_source_x_1, '0', blocks_add_xx_0, '0']
 - [analog_sig_source_x_1_0, '0', blocks_add_xx_0_0, '0']
-- [audio_source_0, '0', blocks_multiply_const_vxx_0, '0']
-- [audio_source_0, '0', blocks_multiply_const_vxx_0_0, '0']
+- [audio_source_0, '0', mmse_resampler_xx_1, '0']
 - [band_pass_filter_0, '0', analog_nbfm_rx_0, '0']
 - [band_pass_filter_0, '0', blocks_complex_to_mag_0, '0']
 - [band_pass_filter_0, '0', blocks_complex_to_real_0, '0']
@@ -1329,7 +1356,7 @@ connections:
 - [blocks_multiply_const_vxx_4, '0', blocks_add_xx_2, '1']
 - [blocks_multiply_xx_0, '0', band_pass_filter_0_0, '0']
 - [blocks_mute_xx_0_0_0, '0', blocks_keep_one_in_n_0_0, '0']
-- [blocks_mute_xx_0_0_0, '0', rational_resampler_xxx_0, '0']
+- [blocks_mute_xx_0_0_0, '0', mmse_resampler_xx_0, '0']
 - [blocks_selector_0, '0', blocks_null_sink_0, '0']
 - [blocks_selector_0, '1', soapy_hackrf_sink_0, '0']
 - [blocks_vector_to_stream_0, '0', network_udp_sink_0, '0']
@@ -1339,7 +1366,9 @@ connections:
 - [logpwrfft_x_0, '0', blocks_vector_to_stream_0, '0']
 - [logpwrfft_x_0_0, '0', blocks_vector_to_stream_0_0, '0']
 - [low_pass_filter_0, '0', audio_sink_0, '0']
-- [rational_resampler_xxx_0, '0', blocks_selector_0, '0']
+- [mmse_resampler_xx_0, '0', blocks_selector_0, '0']
+- [mmse_resampler_xx_1, '0', blocks_multiply_const_vxx_0, '0']
+- [mmse_resampler_xx_1, '0', blocks_multiply_const_vxx_0_0, '0']
 - [rational_resampler_xxx_1, '0', freq_xlating_fir_filter_xxx_0, '0']
 - [soapy_hackrf_source_0, '0', rational_resampler_xxx_1, '0']
 

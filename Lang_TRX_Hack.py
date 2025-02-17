@@ -49,6 +49,7 @@ class Lang_TRX_Hack(gr.top_block):
         self.Rx_Filt_Low = Rx_Filt_Low = 300
         self.Rx_Filt_High = Rx_Filt_High = 3000
         self.RxOffset = RxOffset = 0
+        self.RATE = RATE = 0
         self.PTT = PTT = False
         self.MicGain = MicGain = 5.0
         self.KEY = KEY = False
@@ -88,19 +89,19 @@ class Lang_TRX_Hack(gr.top_block):
         self.soapy_hackrf_sink_0.set_bandwidth(0, 0)
         self.soapy_hackrf_sink_0.set_frequency(0, Tx_LO)
         self.soapy_hackrf_sink_0.set_gain(0, 'AMP', True)
-        self.soapy_hackrf_sink_0.set_gain(0, 'VGA', min(max((47-Tx_Gain), 0.0), 47.0))
+        self.soapy_hackrf_sink_0.set_gain(0, 'VGA', min(max(Tx_Gain, 0.0), 47.0))
         self.rational_resampler_xxx_1 = filter.rational_resampler_ccc(
                 interpolation=33,
                 decimation=500,
                 taps=[],
                 fractional_bw=0)
-        self.rational_resampler_xxx_0 = filter.rational_resampler_ccc(
-                interpolation=500,
-                decimation=3,
-                taps=[],
-                fractional_bw=0)
         self.network_udp_sink_1 = network.udp_sink(gr.sizeof_float, 1, '127.0.0.1', 7474, 0, 2048, False)
         self.network_udp_sink_0 = network.udp_sink(gr.sizeof_float, 1, '127.0.0.1', 7373, 0, 2048, False)
+        self.mmse_resampler_xx_1 = filter.mmse_resampler_ff(0, (480/481))
+        self.mmse_resampler_xx_1.set_block_alias("48/49")
+        self.mmse_resampler_xx_1.set_min_output_buffer(4096)
+        self.mmse_resampler_xx_1.set_max_output_buffer(8192)
+        self.mmse_resampler_xx_0 = filter.mmse_resampler_cc(0, (48/(8000 + 100*RATE)))
         self.low_pass_filter_0 = filter.fir_filter_fff(
             1,
             firdes.low_pass(
@@ -208,7 +209,7 @@ class Lang_TRX_Hack(gr.top_block):
           )
         self.analog_const_source_x_0 = analog.sig_source_f(0, analog.GR_CONST_WAVE, 0, 0, 0)
         self.analog_agc3_xx_0 = analog.agc3_cc((1e-2), (5e-7), 0.1, 1.0, 1)
-        self.analog_agc3_xx_0.set_max_gain(1000)
+        self.analog_agc3_xx_0.set_max_gain(1000) 
 
 
         ##################################################
@@ -223,8 +224,7 @@ class Lang_TRX_Hack(gr.top_block):
         self.connect((self.analog_sig_source_x_0, 0), (self.blocks_multiply_xx_0, 1))
         self.connect((self.analog_sig_source_x_1, 0), (self.blocks_add_xx_0, 0))
         self.connect((self.analog_sig_source_x_1_0, 0), (self.blocks_add_xx_0_0, 0))
-        self.connect((self.audio_source_0, 0), (self.blocks_multiply_const_vxx_0, 0))
-        self.connect((self.audio_source_0, 0), (self.blocks_multiply_const_vxx_0_0, 0))
+        self.connect((self.audio_source_0, 0), (self.mmse_resampler_xx_1, 0))
         self.connect((self.band_pass_filter_0, 0), (self.analog_nbfm_rx_0, 0))
         self.connect((self.band_pass_filter_0, 0), (self.blocks_complex_to_mag_0, 0))
         self.connect((self.band_pass_filter_0, 0), (self.blocks_complex_to_real_0, 0))
@@ -254,7 +254,7 @@ class Lang_TRX_Hack(gr.top_block):
         self.connect((self.blocks_multiply_const_vxx_4, 0), (self.blocks_add_xx_2, 1))
         self.connect((self.blocks_multiply_xx_0, 0), (self.band_pass_filter_0_0, 0))
         self.connect((self.blocks_mute_xx_0_0_0, 0), (self.blocks_keep_one_in_n_0_0, 0))
-        self.connect((self.blocks_mute_xx_0_0_0, 0), (self.rational_resampler_xxx_0, 0))
+        self.connect((self.blocks_mute_xx_0_0_0, 0), (self.mmse_resampler_xx_0, 0))
         self.connect((self.blocks_selector_0, 0), (self.blocks_null_sink_0, 0))
         self.connect((self.blocks_selector_0, 1), (self.soapy_hackrf_sink_0, 0))
         self.connect((self.blocks_vector_to_stream_0, 0), (self.network_udp_sink_0, 0))
@@ -264,7 +264,9 @@ class Lang_TRX_Hack(gr.top_block):
         self.connect((self.logpwrfft_x_0, 0), (self.blocks_vector_to_stream_0, 0))
         self.connect((self.logpwrfft_x_0_0, 0), (self.blocks_vector_to_stream_0_0, 0))
         self.connect((self.low_pass_filter_0, 0), (self.audio_sink_0, 0))
-        self.connect((self.rational_resampler_xxx_0, 0), (self.blocks_selector_0, 0))
+        self.connect((self.mmse_resampler_xx_0, 0), (self.blocks_selector_0, 0))
+        self.connect((self.mmse_resampler_xx_1, 0), (self.blocks_multiply_const_vxx_0, 0))
+        self.connect((self.mmse_resampler_xx_1, 0), (self.blocks_multiply_const_vxx_0_0, 0))
         self.connect((self.rational_resampler_xxx_1, 0), (self.freq_xlating_fir_filter_xxx_0, 0))
         self.connect((self.soapy_hackrf_source_0, 0), (self.rational_resampler_xxx_1, 0))
 
@@ -292,7 +294,7 @@ class Lang_TRX_Hack(gr.top_block):
 
     def set_Tx_Gain(self, Tx_Gain):
         self.Tx_Gain = Tx_Gain
-        self.soapy_hackrf_sink_0.set_gain(0, 'VGA', min(max((47-self.Tx_Gain), 0.0), 47.0))
+        self.soapy_hackrf_sink_0.set_gain(0, 'VGA', min(max(self.Tx_Gain, 0.0), 47.0))
 
     def get_Tx_Filt_Low(self):
         return self.Tx_Filt_Low
@@ -366,6 +368,13 @@ class Lang_TRX_Hack(gr.top_block):
     def set_RxOffset(self, RxOffset):
         self.RxOffset = RxOffset
         self.freq_xlating_fir_filter_xxx_0.set_center_freq(self.RxOffset)
+
+    def get_RATE(self):
+        return self.RATE
+
+    def set_RATE(self, RATE):
+        self.RATE = RATE
+        self.mmse_resampler_xx_0.set_resamp_ratio((48/(8000 + 100*self.RATE)))
 
     def get_PTT(self):
         return self.PTT
@@ -489,6 +498,9 @@ def docommands(tb):
            if line[0]=='G':
               value=int(line[1:])
               tb.set_MicGain(value) 
+           if line[0]=='r':
+              value=int(line[1:])
+              tb.set_RATE(value)
            if line[0]=='g':
               value=int(line[1:])
               tb.set_FMMIC(value)

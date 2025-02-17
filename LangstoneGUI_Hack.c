@@ -242,6 +242,8 @@ int tuneDigit=8;
 #define TXDELAY 10000      //10ms delay between setting Tx output bit and sending tx command to SDR
 #define RXDELAY 10000       //10ms delay between sending rx command to SDR and setting Tx output bit low. 
 
+#define TXHACKDELAY 500000      //500ms time that the Tx clock rate is temporarily increased at the start of each transmission. This helps to prevent tx Buffer Underruns with the HackRF One. 
+
 #define BurstLength 500000     //length of 1750Hz Burst   500ms
 
 char mousePath[30];
@@ -249,7 +251,6 @@ char touchPath[30];
 int mousePresent;
 int touchPresent;
 int portsdownPresent;
-
 
 int popupSel=0;
 int popupFirstBand;
@@ -2343,12 +2344,15 @@ void setTx(int pt)
       {
         clearWaterfall();
       }
+      sendFifo("r6");                       //temporarily increase output sample rate to ensure the output sink doesn't run out of data
       sendFifo("T");
       gotoXY(txX,txY);
       setForeColour(255,0,0);
       textSize=2;
       displayStr("Tx");
       transmitting=1;  
+      usleep(TXHACKDELAY);                   //wait 1/2 secondfor the Tx to start up
+      sendFifo("r0");                       //reset to the nominal sample rate     
     }
   else if((pt==0)&&(transmitting==1))
     {
