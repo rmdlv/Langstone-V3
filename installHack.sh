@@ -94,6 +94,10 @@ sudo rm /etc/profile.d/sshpwd.sh
 
 #make Langstone autostart on boot
 
+cd Langstone
+cp run_hack run
+cp stop_hack stop
+
 if !(grep Langstone ~/.bashrc) then
   echo if test -z \"\$SSH_CLIENT\" >> ~/.bashrc 
   echo then >> ~/.bashrc
