@@ -153,6 +153,30 @@ blocks:
     coordinate: [752, 12]
     rotation: 0
     state: enabled
+- name: Rx_AMP
+  id: variable
+  parameters:
+    comment: ''
+    value: 'True'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [192, 12.0]
+    rotation: 0
+    state: enabled
+- name: Rx_Base
+  id: variable
+  parameters:
+    comment: ''
+    value: '62'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [336, 12.0]
+    rotation: 0
+    state: enabled
 - name: Rx_Filt_High
   id: variable
   parameters:
@@ -181,12 +205,12 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '30'
+    value: '40'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [392, 12.0]
+    coordinate: [264, 12.0]
     rotation: 0
     state: enabled
 - name: Rx_LO
@@ -1297,7 +1321,7 @@ blocks:
   parameters:
     affinity: ''
     alias: ''
-    amp: 'True'
+    amp: Rx_AMP
     bandwidth: '0'
     center_freq: Rx_LO
     comment: ''
@@ -1307,7 +1331,7 @@ blocks:
     minoutbuf: '0'
     samp_rate: '8000000'
     type: fc32
-    vga: '16'
+    vga: Rx_Base
   states:
     bus_sink: false
     bus_source: false

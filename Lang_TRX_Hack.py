@@ -45,9 +45,11 @@ class Lang_TRX_Hack(gr.top_block):
         self.Rx_Mute = Rx_Mute = False
         self.Rx_Mode = Rx_Mode = 0
         self.Rx_LO = Rx_LO = 435100000
-        self.Rx_Gain = Rx_Gain = 30
+        self.Rx_Gain = Rx_Gain = 40
         self.Rx_Filt_Low = Rx_Filt_Low = 300
         self.Rx_Filt_High = Rx_Filt_High = 3000
+        self.Rx_Base = Rx_Base = 62
+        self.Rx_AMP = Rx_AMP = True
         self.RxOffset = RxOffset = 0
         self.RATE = RATE = 0
         self.PTT = PTT = False
@@ -74,9 +76,9 @@ class Lang_TRX_Hack(gr.top_block):
         self.soapy_hackrf_source_0.set_sample_rate(0, 8000000)
         self.soapy_hackrf_source_0.set_bandwidth(0, 0)
         self.soapy_hackrf_source_0.set_frequency(0, Rx_LO)
-        self.soapy_hackrf_source_0.set_gain(0, 'AMP', True)
+        self.soapy_hackrf_source_0.set_gain(0, 'AMP', Rx_AMP)
         self.soapy_hackrf_source_0.set_gain(0, 'LNA', min(max(Rx_Gain, 0.0), 40.0))
-        self.soapy_hackrf_source_0.set_gain(0, 'VGA', min(max(16, 0.0), 62.0))
+        self.soapy_hackrf_source_0.set_gain(0, 'VGA', min(max(Rx_Base, 0.0), 62.0))
         self.soapy_hackrf_sink_0 = None
         dev = 'driver=hackrf'
         stream_args = ''
@@ -209,7 +211,7 @@ class Lang_TRX_Hack(gr.top_block):
           )
         self.analog_const_source_x_0 = analog.sig_source_f(0, analog.GR_CONST_WAVE, 0, 0, 0)
         self.analog_agc3_xx_0 = analog.agc3_cc((1e-2), (5e-7), 0.1, 1.0, 1)
-        self.analog_agc3_xx_0.set_max_gain(1000) 
+        self.analog_agc3_xx_0.set_max_gain(1000)
 
 
         ##################################################
@@ -362,6 +364,20 @@ class Lang_TRX_Hack(gr.top_block):
         self.Rx_Filt_High = Rx_Filt_High
         self.band_pass_filter_0.set_taps(firdes.complex_band_pass(1, 48000, self.Rx_Filt_Low, self.Rx_Filt_High, 100, window.WIN_HAMMING, 6.76))
 
+    def get_Rx_Base(self):
+        return self.Rx_Base
+
+    def set_Rx_Base(self, Rx_Base):
+        self.Rx_Base = Rx_Base
+        self.soapy_hackrf_source_0.set_gain(0, 'VGA', min(max(self.Rx_Base, 0.0), 62.0))
+
+    def get_Rx_AMP(self):
+        return self.Rx_AMP
+
+    def set_Rx_AMP(self, Rx_AMP):
+        self.Rx_AMP = Rx_AMP
+        self.soapy_hackrf_source_0.set_gain(0, 'AMP', self.Rx_AMP)
+
     def get_RxOffset(self):
         return self.RxOffset
 
@@ -437,6 +453,7 @@ class Lang_TRX_Hack(gr.top_block):
         self.AFGain = AFGain
         self.blocks_multiply_const_vxx_1.set_k(((self.AFGain/100.0) *  (not self.Rx_Mute)))
 
+
 def docommands(tb):
   try:
     os.mkfifo("/tmp/langstoneTRx")
@@ -475,6 +492,12 @@ def docommands(tb):
            if line[0]=='A':
               value=int(line[1:])
               tb.set_Rx_Gain(value) 
+           if line[0]=='b':
+              value=int(line[1:])
+              tb.set_Rx_Base(value) 
+            if line[0]=='p':
+              value=int(line[1:])
+              tb.set_Rx_AMP(value)              
            if line[0]=='F':
               value=int(line[1:])
               tb.set_Rx_Filt_High(value) 
@@ -528,7 +551,6 @@ def docommands(tb):
                                                                                 
        except:
          break
-
 
 
 def main(top_block_cls=Lang_TRX_Hack, options=None):
