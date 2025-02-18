@@ -65,7 +65,7 @@ def docommands(tb):
            if line[0]=='b':
               value=int(line[1:])
               tb.set_Rx_Base(value) 
-            if line[0]=='p':
+           if line[0]=='p':
               value=int(line[1:])
               tb.set_Rx_AMP(value)              
            if line[0]=='F':

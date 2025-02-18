@@ -66,6 +66,8 @@ void setInputMode(int n);
 void gen_palette(char colours[][3],int num_grads);
 void setHackTxGain(int gain);
 void setHackRxGain(int gain);
+void setHackRxAmp(int gain);
+void setHackRxBase(int gain);
 void setBand(int b);
 void setTxPin(int v);
 long long runTimeMs(void);                                                    
@@ -98,7 +100,9 @@ int bandBitsTx[numband]={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 int bandSquelch[numband][nummode]={0};
 int bandFFTRef[numband]={-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10};
 int bandTxGain[numband]={47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47};
-int bandRxGain[numband]={40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40};   
+int bandRxGain[numband]={40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40};  
+int bandRxAmp[numband]={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}; 
+int bandRxBase[numband]={16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16};  
 int bandDuplex[numband]={0};
 int bandCTCSS[numband]={0};
 float bandSmeterZero[numband]={-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80};
@@ -118,11 +122,11 @@ int lastmode=0;
 char * modename[nummode]={"USB","LSB","CW ","CWN","FM ","AM "};
 enum {USB,LSB,CW,CWN,FM,AM};
 
-#define numSettings 21
+#define numSettings 23
 
-char * settingText[numSettings]={"Rx Gain= ","SSB Mic Gain= ","FM Mic Gain= ","AM Mic Gain= ","Repeater Shift= ","CTCSS= "," Rx Offset= ","Rx Harmonic Mixing= "," Tx Offset= ","Tx Harmonic Mixing= ","Band Bits (Rx)= ","Band Bits (Tx)= ","FFT Ref= ","Tx gain= ","S-Meter Zero= ", "SSB Rx Filter Low= ", "SSB Rx Filter High= ","CW Ident= ", "CWID Carrier= ", "CW Break-In Hang Time= ", "24 Bands= "};
-enum {RX_GAIN,SSB_MIC,FM_MIC,AM_MIC,REP_SHIFT,CTCSS,RX_OFFSET,RX_HARMONIC,TX_OFFSET,TX_HARMONIC,BAND_BITS_RX,BAND_BITS_TX,FFT_REF,TX_GAIN,S_ZERO,SSB_FILT_LOW,SSB_FILT_HIGH,CWID,CW_CARRIER,BREAK_IN_TIME,BANDS24};
-int settingNo=RX_GAIN;
+char * settingText[numSettings]={"Rx Amp= ","Rx Gain= ","Rx Baseband= ","SSB Mic Gain= ","FM Mic Gain= ","AM Mic Gain= ","Repeater Shift= ","CTCSS= "," Rx Offset= ","Rx Harmonic Mixing= "," Tx Offset= ","Tx Harmonic Mixing= ","Band Bits (Rx)= ","Band Bits (Tx)= ","FFT Ref= ","Tx gain= ","S-Meter Zero= ", "SSB Rx Filter Low= ", "SSB Rx Filter High= ","CW Ident= ", "CWID Carrier= ", "CW Break-In Hang Time= ", "24 Bands= "};
+enum {RX_AMP,RX_GAIN,RX_BASE,SSB_MIC,FM_MIC,AM_MIC,REP_SHIFT,CTCSS,RX_OFFSET,RX_HARMONIC,TX_OFFSET,TX_HARMONIC,BAND_BITS_RX,BAND_BITS_TX,FFT_REF,TX_GAIN,S_ZERO,SSB_FILT_LOW,SSB_FILT_HIGH,CWID,CW_CARRIER,BREAK_IN_TIME,BANDS24};
+int settingNo=RX_AMP;
 int setIndex=0;
 int maxSetIndex=10;
 
@@ -1005,6 +1009,19 @@ void setHackRxGain(int gain)
   sendFifo(gainStr);
 }
 
+void setHackRxAmp(int gain)
+{ 
+  char gainStr[10];
+  sprintf(gainStr,"p%d",gain);
+  sendFifo(gainStr);
+}
+
+void setHackRxBase(int gain)
+{ 
+  char gainStr[10];
+  sprintf(gainStr,"b%d",gain);
+  sendFifo(gainStr);
+}
 
 void initUDP(void)
 {
@@ -1901,6 +1918,8 @@ void setBand(int b)
   TxGain=bandTxGain[band];
   setHackTxGain(TxGain);
   setHackRxGain(bandRxGain[band]);
+  setHackRxAmp(bandRxAmp[band]);
+  setHackRxBase(bandRxBase[band]);
   configCounter=configDelay;
 }
 
@@ -2929,13 +2948,31 @@ if(settingNo==BAND_BITS_TX)        // Band Bits Tx
       }  
      if(settingNo==RX_GAIN)        // Rx Gain Setting
       { 
-      bandRxGain[band]=bandRxGain[band]+mouseScroll;
+      bandRxGain[band]=bandRxGain[band]+mouseScroll*8;
       mouseScroll=0;
       if(bandRxGain[band]< 0) bandRxGain[band]=0;
       if(bandRxGain[band]> 40) bandRxGain[band]=40;
       setHackRxGain(bandRxGain[band]);
       displaySetting(settingNo);  
-      }                   
+      } 
+     if(settingNo==RX_AMP)        // Rx AMP Setting
+      { 
+      bandRxAmp[band]=bandRxAmp[band]+mouseScroll;
+      mouseScroll=0;
+      if(bandRxAmp[band]< 0) bandRxAmp[band]=0;
+      if(bandRxAmp[band]> 1) bandRxAmp[band]=1;
+      setHackRxAmp(bandRxAmp[band]);
+      displaySetting(settingNo);  
+      }         
+    if(settingNo==RX_BASE)        // Rx Baseband Setting
+      { 
+      bandRxBase[band]=bandRxBase[band]+mouseScroll * 2;
+      mouseScroll=0;
+      if(bandRxBase[band]< 0) bandRxBase[band]=0;
+      if(bandRxBase[band]> 62) bandRxBase[band]=62;
+      setHackRxBase(bandRxBase[band]);
+      displaySetting(settingNo);  
+      }                 
     if(settingNo==S_ZERO)        // S Meter Zero
       {
       bandSmeterZero[band]=bandSmeterZero[band]+mouseScroll;
@@ -3140,8 +3177,23 @@ if(se==BAND_BITS_TX)
   }
   if(se==RX_GAIN)
   {
-
-  sprintf(valStr,"%d",bandRxGain[band]);
+  sprintf(valStr,"%d dB",bandRxGain[band]);
+  displayStr(valStr);
+  }
+  if(se==RX_AMP)
+  {
+    if(bandRxAmp[band] == 0)
+     {
+       displayStr("Off");
+     }
+     else
+     {
+       displayStr("On (14dB)");
+     }
+  }
+  if(se==RX_BASE)
+  {
+  sprintf(valStr,"%d dB",bandRxBase[band]);
   displayStr(valStr);
   }
   if(se==S_ZERO)
@@ -3301,7 +3353,11 @@ while(fscanf(conffile,"%49s %99s [^\n]\n",variable,value) !=EOF)
     sprintf(vname,"bandTxGain%02d",b);
     if(strstr(variable,vname)) sscanf(value,"%d",&bandTxGain[b]);
     sprintf(vname,"bandRxGain%02d",b);
-    if(strstr(variable,vname)) sscanf(value,"%d",&bandRxGain[b]);    
+    if(strstr(variable,vname)) sscanf(value,"%d",&bandRxGain[b]); 
+    sprintf(vname,"bandRxAmp%02d",b);
+    if(strstr(variable,vname)) sscanf(value,"%d",&bandRxAmp[b]); 
+    sprintf(vname,"bandRxBase%02d",b);
+    if(strstr(variable,vname)) sscanf(value,"%d",&bandRxBase[b]);   
     sprintf(vname,"bandSmeterZero%02d",b);
     if(strstr(variable,vname)) sscanf(value,"%f",&bandSmeterZero[b]);
     sprintf(vname,"bandSSBFiltLow%02d",b);
@@ -3381,6 +3437,8 @@ for(int b=0;b<numband;b++)
   fprintf(conffile,"bandSquelchAM%02d %d\n",b,bandSquelch[b][AM]);
   fprintf(conffile,"bandTxGain%02d %d\n",b,bandTxGain[b]);
   fprintf(conffile,"bandRxGain%02d %d\n",b,bandRxGain[b]);
+  fprintf(conffile,"bandRxAmp%02d %d\n",b,bandRxAmp[b]);
+  fprintf(conffile,"bandRxBase%02d %d\n",b,bandRxBase[b]);
   fprintf(conffile,"bandSmeterZero%02d %f\n",b,bandSmeterZero[b]);
   fprintf(conffile,"bandSSBFiltLow%02d %d\n",b,bandSSBFiltLow[b]);
   fprintf(conffile,"bandSSBFiltHigh%02d %d\n",b,bandSSBFiltHigh[b]);
