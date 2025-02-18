@@ -51,7 +51,6 @@ void processGPIO(void);
 void initGPIO(void);
 int readConfig(void);
 int writeConfig(void);
-int satMode(void);
 int splitMode(void);
 int txvtrMode(void);
 int duplexMode(void);
@@ -109,7 +108,7 @@ int bandFFTBW[numband]={0};
 
 #define minFreq 0.0
 #define maxFreq 99999.99999
-#define minHwFreq 69.9
+#define minHwFreq 1.0
 #define maxHwFreq 5999.99999
 
 
@@ -493,7 +492,7 @@ void waterfall()
 
 
      //check if data avilable to read
-      if((transmitting==1) && (satMode()==0))
+      if(transmitting==1)
         {
         ret = fread(&inbuf,sizeof(float),1,txfftstream);
         fftref=10;
@@ -521,7 +520,7 @@ void waterfall()
         //Read in float values, shift centre and store in buffer 1st 'row'
         for(int p=1;p<points;p++)
         {                                               
-          if((transmitting==1) && (satMode()==0))
+          if(transmitting==1)
           {
           fread(&inbuf,sizeof(float),1,txfftstream);
           }
@@ -540,7 +539,7 @@ void waterfall()
         }
  
  
-        if(((mode==CW)||(mode==CWN)) && (transmitting==1) && (satMode()==0))
+        if(((mode==CW)||(mode==CWN)) && (transmitting==1) )
           {
           bwbaroffset=800/HzPerBin;
           }
@@ -622,7 +621,7 @@ void waterfall()
           
         
           
-          if (((mode==CW) || (mode==CWN)) && (transmitting==0 && satMode()== 0))
+          if (((mode==CW) || (mode==CWN)) && (transmitting==0))
           {
            centreShift=800/HzPerBin;
           }
@@ -699,7 +698,7 @@ void waterfall()
 
  
 
-          if((transmitting==0) || (satMode()==1))
+          if(transmitting==0)
           {
           S_Meter();
           }
@@ -1294,14 +1293,9 @@ gotoXY(funcButtonsX,funcButtonsY);
   }
 
   displayButton("SET");
-  if(satMode()==1) 
-    {
-    displayButton("MONI");
-    }
-  else
-  {
-    displayButton("    ");
-  }
+
+  displayButton("    ");
+  
   if(sendBeacon > 0)
     {
     setForeColour(255,0,0);
@@ -1716,14 +1710,10 @@ if(buttonTouched(funcButtonsX+buttonSpaceX*3,funcButtonsY))    // Button4 =SET o
       }
     }
        
-if(buttonTouched(funcButtonsX+buttonSpaceX*4,funcButtonsY))    //Button 5 =MONI (only allowed in Sat mode)  or Blank
+if(buttonTouched(funcButtonsX+buttonSpaceX*4,funcButtonsY))    //Button 5 Blank
     {
     if(inputMode==FREQ)
-      {
-      if(satMode()==1)
-        {
-        if(moni==1) setMoni(0); else setMoni(1);
-        }      
+      {     
       return;
       } 
     else
@@ -2335,15 +2325,9 @@ void setTx(int pt)
         displayMenu();
         }
       if (moni==0) setMute(1);                        //mute the receiver
-      if(satMode()==0)
-      {
-        sMeter=0;
-        setHwRxFreq(freq+10.0);               //offset the Rx frequency to prevent unwanted mixing. (happens even if disabled!) 
-      }
-      if(satMode()==0)
-      {
-        clearWaterfall();
-      }
+      sMeter=0;
+      setHwRxFreq(freq+10.0);               //offset the Rx frequency to prevent unwanted mixing. (happens even if disabled!) 
+      clearWaterfall();
       sendFifo("r6");                       //temporarily increase output sample rate to ensure the output sink doesn't run out of data
       sendFifo("T");
       gotoXY(txX,txY);
@@ -2356,12 +2340,8 @@ void setTx(int pt)
     }
   else if((pt==0)&&(transmitting==1))
     {
-      if(satMode()==0)
-      {
       sMeter=0;
       clearWaterfall();
-      }
-      
       sendFifo("R");
       setMute(0);                  //unmute the receiver 
       setHwTxFreq(freq+10.0);           //offset the Tx freq to prevent unwanted spurious
@@ -2527,7 +2507,7 @@ void setFreq(double fr)
 
 displayFreq(fr);
  
-//set XVTR, SAT, SPLIT or MULT indication if needed.
+//set XVTR,SPLIT or MULT indication if needed.
   gotoXY(txvtrX,txvtrY);
   setForeColour(0,255,0);
   textSize=2;
@@ -2538,10 +2518,6 @@ displayFreq(fr);
   else if( txvtrMode()==1)
     {
      displayStr(" XVTR  "); 
-    }
-  else if(satMode()==1)
-    {
-    displayStr("  SAT  ");
     }
   else if(splitMode()==1)
     {
@@ -2556,36 +2532,17 @@ displayFreq(fr);
    setForeColour(0,255,0);
    if(inputMode==FREQ)
    {
-     if(satMode()==1)
-      {
-       displayButton("MONI");
-       setMoni(moni);
-      }  
-      else
-      {
-       displayButton("    ");
-       setMoni(0);
-      }
+    displayButton("    ");
+    setMoni(0);
     }
  
  configCounter=configDelay;                       //write config after this amount of inactivity    
 }
 
-int satMode(void)
-{
-if(((abs(bandTxOffset[band]-bandRxOffset[band]) > 1 ) & (bandRxOffset[band]!=0) ) & bandRxHarmonic[band]<2  & bandTxHarmonic[band]<2 )     // if we have a differnt Rx and Tx offset and we are not multiplying then we must be in Sat mode. 
-  {
-  return 1;
-  }
-else
-  {
-  return 0;
-  }
-}
 
 int txvtrMode(void)
 {
-if((abs(bandTxOffset[band]-bandRxOffset[band]) <1) & (abs(bandTxOffset[band]) >1 )  )       //if the tx and rx offset are the same and non zero then we are in Transverter mode
+if((abs(bandRxOffset[band]) >1) & (abs(bandTxOffset[band]) >1 )  )       //if the tx and rx offset are non zero then we are in Transverter mode
   {
   return 1;
   }
