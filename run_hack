@@ -9,8 +9,8 @@ mkfifo /tmp/langstoneTRx
 
 #Test to see if the flowgraph is already running
 if !(ps -ax |grep -v grep| grep -q Lang_TRX_Hack.py) then
-   sudo amixer  cset numid=6 100%  > /dev/null 2>&1
-   sudo amixer  cset numid=8 50%  > /dev/null 2>&1
+   sudo amixer -c 2 cset numid=6 100%  > /dev/null 2>&1
+   sudo amixer -c 2 cset numid=8 50%  > /dev/null 2>&1
    sudo cp /home/pi/Langstone/splashload.bgra /dev/fb0   
 
    #start up the GNU Radio flowgraph
@@ -32,4 +32,3 @@ else
    sleep 5
 fi
 
-sudo cp /home/pi/Langstone/splash.bgra /dev/fb0
