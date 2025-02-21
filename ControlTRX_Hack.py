@@ -67,7 +67,10 @@ def docommands(tb):
               tb.set_Rx_Base(value) 
            if line[0]=='p':
               value=int(line[1:])
-              tb.set_Rx_AMP(value)              
+              tb.set_Rx_AMP(value)   
+           if line[0]=='P':
+              value=int(line[1:])
+              tb.set_Tx_AMP(value)           
            if line[0]=='F':
               value=int(line[1:])
               tb.set_Rx_Filt_High(value) 

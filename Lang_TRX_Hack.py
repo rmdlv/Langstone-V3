@@ -41,6 +41,7 @@ class Lang_TRX_Hack(gr.top_block):
         self.Tx_Gain = Tx_Gain = 0
         self.Tx_Filt_Low = Tx_Filt_Low = 300
         self.Tx_Filt_High = Tx_Filt_High = 3000
+        self.Tx_AMP = Tx_AMP = True
         self.ToneBurst = ToneBurst = False
         self.Rx_Mute = Rx_Mute = False
         self.Rx_Mode = Rx_Mode = 0
@@ -90,7 +91,7 @@ class Lang_TRX_Hack(gr.top_block):
         self.soapy_hackrf_sink_0.set_sample_rate(0, 8000000)
         self.soapy_hackrf_sink_0.set_bandwidth(0, 0)
         self.soapy_hackrf_sink_0.set_frequency(0, Tx_LO)
-        self.soapy_hackrf_sink_0.set_gain(0, 'AMP', True)
+        self.soapy_hackrf_sink_0.set_gain(0, 'AMP', Tx_AMP)
         self.soapy_hackrf_sink_0.set_gain(0, 'VGA', min(max(Tx_Gain, 0.0), 47.0))
         self.rational_resampler_xxx_1 = filter.rational_resampler_ccc(
                 interpolation=33,
@@ -211,7 +212,7 @@ class Lang_TRX_Hack(gr.top_block):
           )
         self.analog_const_source_x_0 = analog.sig_source_f(0, analog.GR_CONST_WAVE, 0, 0, 0)
         self.analog_agc3_xx_0 = analog.agc3_cc((1e-2), (5e-7), 0.1, 1.0, 1)
-        self.analog_agc3_xx_0.set_max_gain(1000)
+        self.analog_agc3_xx_0.set_max_gain(1000) 
 
 
         ##################################################
@@ -311,6 +312,13 @@ class Lang_TRX_Hack(gr.top_block):
     def set_Tx_Filt_High(self, Tx_Filt_High):
         self.Tx_Filt_High = Tx_Filt_High
         self.band_pass_filter_0_0.set_taps(firdes.complex_band_pass(1, 48000, self.Tx_Filt_Low, self.Tx_Filt_High, 100, window.WIN_HAMMING, 6.76))
+
+    def get_Tx_AMP(self):
+        return self.Tx_AMP
+
+    def set_Tx_AMP(self, Tx_AMP):
+        self.Tx_AMP = Tx_AMP
+        self.soapy_hackrf_sink_0.set_gain(0, 'AMP', self.Tx_AMP)
 
     def get_ToneBurst(self):
         return self.ToneBurst
@@ -453,7 +461,6 @@ class Lang_TRX_Hack(gr.top_block):
         self.AFGain = AFGain
         self.blocks_multiply_const_vxx_1.set_k(((self.AFGain/100.0) *  (not self.Rx_Mute)))
 
-
 def docommands(tb):
   try:
     os.mkfifo("/tmp/langstoneTRx")
@@ -497,7 +504,10 @@ def docommands(tb):
               tb.set_Rx_Base(value) 
            if line[0]=='p':
               value=int(line[1:])
-              tb.set_Rx_AMP(value)              
+              tb.set_Rx_AMP(value)   
+           if line[0]=='P':
+              value=int(line[1:])
+              tb.set_Tx_AMP(value)           
            if line[0]=='F':
               value=int(line[1:])
               tb.set_Rx_Filt_High(value) 
@@ -551,6 +561,7 @@ def docommands(tb):
                                                                                 
        except:
          break
+
 
 
 def main(top_block_cls=Lang_TRX_Hack, options=None):

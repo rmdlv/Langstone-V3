@@ -64,6 +64,7 @@ void S_Meter(void);
 void setRit(int rit);
 void setInputMode(int n);
 void gen_palette(char colours[][3],int num_grads);
+void setHackTxAmp(int gain);
 void setHackTxGain(int gain);
 void setHackRxGain(int gain);
 void setHackRxAmp(int gain);
@@ -88,10 +89,10 @@ double freqInc=0.001;
 #define numband 24
 int band=3;
 #define nummode 6
-double bandFreq[numband] = {70.200,144.200,432.200,1296.200,2320.200,2400.100,3400.100,5760.100,10368.200,24048.200,47088.2,10489.55,433.2,433.2,433.2,433.2,433.2,433.2,1296.2,1296.2,1296.2,1296.2,1296.2,1296.2};
-double bandTxOffset[numband]={0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,-9936.0,-23616.0,-46656.0,-10069.5,0,0,0,0,0,0,0,0,0,0,0,0};
-double bandRxOffset[numband]={0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,-9936.0,-23616.0,-46656.0,-10345.0,0,0,0,0,0,0,0,0,0,0,0,0};
-double bandRepShift[numband]={0,-0.6,1.6,-6.0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+double bandFreq[numband] = {28.5,50.2,70.200,144.200,432.200,1296.200,2300.2,2320.200,2400.100,3400.100,5760.100,1296.2,1296.2,1296.2,1296.2,1296.2,1296.2,1296.2,1296.2,1296.2,1296.2,1296.2,1296.2,1296.2};
+double bandTxOffset[numband]={0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+double bandRxOffset[numband]={0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,0,0,-0,0,0,0,0,0,0,0,0,0,0,0,0};
+double bandRepShift[numband]={0,0,0,-0.6,1.6,-6.0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 int bandTxHarmonic[numband]={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 int bandRxHarmonic[numband]={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 int bandMode[numband]={0};
@@ -99,10 +100,11 @@ int bandBitsRx[numband]={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 int bandBitsTx[numband]={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23};
 int bandSquelch[numband][nummode]={0};
 int bandFFTRef[numband]={-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10};
+int bandTxAmp[numband]={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 int bandTxGain[numband]={47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47};
 int bandRxGain[numband]={40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40};  
 int bandRxAmp[numband]={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}; 
-int bandRxBase[numband]={16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16};  
+int bandRxBase[numband]={24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24};  
 int bandDuplex[numband]={0};
 int bandCTCSS[numband]={0};
 float bandSmeterZero[numband]={-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80};
@@ -122,10 +124,10 @@ int lastmode=0;
 char * modename[nummode]={"USB","LSB","CW ","CWN","FM ","AM "};
 enum {USB,LSB,CW,CWN,FM,AM};
 
-#define numSettings 23
+#define numSettings 24
 
-char * settingText[numSettings]={"Rx Amp= ","Rx Gain= ","Rx Baseband= ","SSB Mic Gain= ","FM Mic Gain= ","AM Mic Gain= ","Repeater Shift= ","CTCSS= "," Rx Offset= ","Rx Harmonic Mixing= "," Tx Offset= ","Tx Harmonic Mixing= ","Band Bits (Rx)= ","Band Bits (Tx)= ","FFT Ref= ","Tx gain= ","S-Meter Zero= ", "SSB Rx Filter Low= ", "SSB Rx Filter High= ","CW Ident= ", "CWID Carrier= ", "CW Break-In Hang Time= ", "24 Bands= "};
-enum {RX_AMP,RX_GAIN,RX_BASE,SSB_MIC,FM_MIC,AM_MIC,REP_SHIFT,CTCSS,RX_OFFSET,RX_HARMONIC,TX_OFFSET,TX_HARMONIC,BAND_BITS_RX,BAND_BITS_TX,FFT_REF,TX_GAIN,S_ZERO,SSB_FILT_LOW,SSB_FILT_HIGH,CWID,CW_CARRIER,BREAK_IN_TIME,BANDS24};
+char * settingText[numSettings]={"Rx Amp= ","Rx Gain= ","Rx Baseband= ","SSB Mic Gain= ","FM Mic Gain= ","AM Mic Gain= ","Repeater Shift= ","CTCSS= "," Rx Offset= ","Rx Harmonic Mixing= "," Tx Offset= ","Tx Harmonic Mixing= ","Band Bits (Rx)= ","Band Bits (Tx)= ","FFT Ref= ","Tx Amp= ","Tx Gain= ","S-Meter Zero= ", "SSB Rx Filter Low= ", "SSB Rx Filter High= ","CW Ident= ", "CWID Carrier= ", "CW Break-In Hang Time= ", "24 Bands= "};
+enum {RX_AMP,RX_GAIN,RX_BASE,SSB_MIC,FM_MIC,AM_MIC,REP_SHIFT,CTCSS,RX_OFFSET,RX_HARMONIC,TX_OFFSET,TX_HARMONIC,BAND_BITS_RX,BAND_BITS_TX,FFT_REF,TX_AMP,TX_GAIN,S_ZERO,SSB_FILT_LOW,SSB_FILT_HIGH,CWID,CW_CARRIER,BREAK_IN_TIME,BANDS24};
 int settingNo=RX_AMP;
 int setIndex=0;
 int maxSetIndex=10;
@@ -238,6 +240,8 @@ int AMMic=20;
 #define maxAMMic 100
 
 int TxGain=47;
+
+int TxAmp = 1;
 
 int tuneDigit=8;
 #define maxTuneDigit 11
@@ -984,14 +988,14 @@ void displayError(char*st)
 void setHackRxFreq(long long rxfreq)
 {
   char freqStr[12];
-  sprintf(freqStr,"L%d",rxfreq);
+  sprintf(freqStr,"L%lld",rxfreq);
   sendFifo(freqStr);
 }
 
 void setHackTxFreq(long long txfreq)
 {
   char freqStr[12];
-  sprintf(freqStr,"l%d",txfreq);
+  sprintf(freqStr,"l%lld",txfreq);
   sendFifo(freqStr);
 }
 
@@ -1008,7 +1012,12 @@ void setHackRxGain(int gain)
   sprintf(gainStr,"A%d",gain);
   sendFifo(gainStr);
 }
-
+void setHackTxAmp(int gain)
+{ 
+  char gainStr[10];
+  sprintf(gainStr,"P%d",gain);
+  sendFifo(gainStr);
+}
 void setHackRxAmp(int gain)
 { 
   char gainStr[10];
@@ -1916,6 +1925,7 @@ void setBand(int b)
   setCTCSS(bandCTCSS[band]);
   FFTRef=bandFFTRef[band];
   TxGain=bandTxGain[band];
+  TxAmp=bandTxAmp[band];
   setHackTxGain(TxGain);
   setHackRxGain(bandRxGain[band]);
   setHackRxAmp(bandRxAmp[band]);
@@ -2946,6 +2956,15 @@ if(settingNo==BAND_BITS_TX)        // Band Bits Tx
       setHackTxGain(TxGain);
       displaySetting(settingNo);  
       }  
+    if(settingNo==TX_AMP)        // Tx AMP Setting
+      { 
+      bandTxAmp[band]=bandTxAmp[band]+mouseScroll;
+      mouseScroll=0;
+      if(bandTxAmp[band]< 0) bandTxAmp[band]=0;
+      if(bandTxAmp[band]> 1) bandTxAmp[band]=1;
+      setHackTxAmp(bandTxAmp[band]);
+      displaySetting(settingNo);  
+      } 
      if(settingNo==RX_GAIN)        // Rx Gain Setting
       { 
       bandRxGain[band]=bandRxGain[band]+mouseScroll*8;
@@ -3175,6 +3194,17 @@ if(se==BAND_BITS_TX)
   sprintf(valStr,"%d",TxGain);
   displayStr(valStr);
   }
+  if(se==TX_AMP)
+  {
+    if(bandTxAmp[band] == 0)
+     {
+       displayStr("Off");
+     }
+     else
+     {
+       displayStr("On (14dB)");
+     }
+  }
   if(se==RX_GAIN)
   {
   sprintf(valStr,"%d dB",bandRxGain[band]);
@@ -3352,6 +3382,8 @@ while(fscanf(conffile,"%49s %99s [^\n]\n",variable,value) !=EOF)
     if(strstr(variable,vname)) sscanf(value,"%d",&bandSquelch[b][AM]);     
     sprintf(vname,"bandTxGain%02d",b);
     if(strstr(variable,vname)) sscanf(value,"%d",&bandTxGain[b]);
+    sprintf(vname,"bandTxAmp%02d",b);
+    if(strstr(variable,vname)) sscanf(value,"%d",&bandTxAmp[b]);
     sprintf(vname,"bandRxGain%02d",b);
     if(strstr(variable,vname)) sscanf(value,"%d",&bandRxGain[b]); 
     sprintf(vname,"bandRxAmp%02d",b);
@@ -3436,6 +3468,7 @@ for(int b=0;b<numband;b++)
   fprintf(conffile,"bandSquelchFM%02d %d\n",b,bandSquelch[b][FM]);
   fprintf(conffile,"bandSquelchAM%02d %d\n",b,bandSquelch[b][AM]);
   fprintf(conffile,"bandTxGain%02d %d\n",b,bandTxGain[b]);
+  fprintf(conffile,"bandTxAmp%02d %d\n",b,bandTxAmp[b]);
   fprintf(conffile,"bandRxGain%02d %d\n",b,bandRxGain[b]);
   fprintf(conffile,"bandRxAmp%02d %d\n",b,bandRxAmp[b]);
   fprintf(conffile,"bandRxBase%02d %d\n",b,bandRxBase[b]);
