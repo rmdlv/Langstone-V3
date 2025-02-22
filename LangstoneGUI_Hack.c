@@ -239,17 +239,13 @@ int FMMic=50;
 int AMMic=20;
 #define maxAMMic 100
 
-int TxGain=47;
-
-int TxAmp = 1;
-
 int tuneDigit=8;
 #define maxTuneDigit 11
 
 #define TXDELAY 10000      //10ms delay between setting Tx output bit and sending tx command to SDR
 #define RXDELAY 10000       //10ms delay between sending rx command to SDR and setting Tx output bit low. 
 
-#define TXHACKDELAY 500000      //500ms time that the Tx clock rate is temporarily increased at the start of each transmission. This helps to prevent tx Buffer Underruns with the HackRF One. 
+#define TXHACKDELAY 400000      //400ms time that the Tx clock rate is temporarily increased at the start of each transmission. This helps to prevent tx Buffer Underruns with the HackRF One. 
 
 #define BurstLength 500000     //length of 1750Hz Burst   500ms
 
@@ -1924,9 +1920,8 @@ void setBand(int b)
   setSquelch(squelch);
   setCTCSS(bandCTCSS[band]);
   FFTRef=bandFFTRef[band];
-  TxGain=bandTxGain[band];
-  TxAmp=bandTxAmp[band];
-  setHackTxGain(TxGain);
+  setHackTxAmp(bandTxAmp[band]);
+  setHackTxGain(bandTxGain[band]);
   setHackRxGain(bandRxGain[band]);
   setHackRxAmp(bandRxAmp[band]);
   setHackRxBase(bandRxBase[band]);
@@ -2364,6 +2359,8 @@ void setTx(int pt)
       textSize=2;
       displayStr("Tx");
       transmitting=1;  
+      usleep(100000);                        //allow time for the Flowgraph to switch to Tx. 
+      setHackTxAmp(bandTxAmp[band]);         //turn on the HackRF Tx amplifier if required. (Going to Rx seems to turn it off internally)
       usleep(TXHACKDELAY);                   //wait 1/2 secondfor the Tx to start up
       sendFifo("r0");                       //reset to the nominal sample rate     
     }
@@ -2948,12 +2945,11 @@ if(settingNo==BAND_BITS_TX)        // Band Bits Tx
       }    
     if(settingNo==TX_GAIN)        // Tx Attenuator
       {
-      TxGain=TxGain+mouseScroll;
+      bandTxGain[band]=bandTxGain[band]+mouseScroll;
       mouseScroll=0;
-      if(TxGain>47) TxGain=47;
-      if(TxGain<0) TxGain=0;
-      bandTxGain[band]=TxGain;
-      setHackTxGain(TxGain);
+      if(bandTxGain[band]>47) bandTxGain[band]=47;
+      if(bandTxGain[band]<0) bandTxGain[band]=0;
+      setHackTxGain(bandTxGain[band]);
       displaySetting(settingNo);  
       }  
     if(settingNo==TX_AMP)        // Tx AMP Setting
@@ -3191,7 +3187,7 @@ if(se==BAND_BITS_TX)
   }
   if(se==TX_GAIN)
   {
-  sprintf(valStr,"%d",TxGain);
+  sprintf(valStr,"%d",bandTxGain[band]);
   displayStr(valStr);
   }
   if(se==TX_AMP)
