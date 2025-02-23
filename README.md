@@ -2,7 +2,7 @@
 
 # This version is still under development. It may not be fully working yet.
 
-# Currently only supports the Adalm Pluto, the Raspberry Pi 5  and the official 7" LCD Display.
+# Currently supports the Adalm Pluto or the HackRF One, the Raspberry Pi 5  and the official 7" LCD Display.
 
 This is an experimental project to produce a simple VHF, UHF and Microwave SDR Transceiver operating on SSB CW and FM.
 
@@ -20,7 +20,7 @@ Currently only the following hardware is supported:-
 
 - RPi5 to Touchscreen flat cable. (this will need to be purchased seperately as the cable supplied with the Touch Screen is not suitable)
 
-- Adalm Pluto SDR Module
+- Adalm Pluto or HackRF One SDR Modules. 
 
 - USB Audio module. Connected to loudspeaker or headphones and microphone. 
  
@@ -36,7 +36,7 @@ Currently only the following hardware is supported:-
 
 - On the Adalm Pluto the TX output and first three of the Band Select outputs are also available on the Internal Pluto GPO connector. GPO0 is the Tx Output, GPO1-3 are the Band Select outputs.The main use for these is for when the Pluto is remotely mounted. Care must be taken as these pins are low voltage. They will need to be buffered before use. 
 
-To build a complete functional transceiver you will need to add suitable filters, preamplifiers and power amplifiers to the Adalm Pluto. 
+To build a complete functional transceiver you will need to add suitable filters, preamplifiers and power amplifiers to the SDR Module. 
 
 All control is done using the touchscreen and mouse.
 
@@ -48,7 +48,7 @@ It is easy to modify a cheap mouse by disconnecting the existing switches and wi
 
 Microphone input and headphone output uses the USB audio device. (a couple of pounds on Ebay)
 
-The software consists of two parts. The SDR itself uses a python GNURadio Flowgraph (Lang_TRX_Pluto.py) which can be created on a PC running GNUradio companion with Lang_TRX_Pluto.grc. This Python program is then manually edited by adding the code from ControlTRX_Pluto.py so it can be controlled by the GUI part of the software (LangstoneGUI_Pluto.c). These are written in C and communicate with GNURadio using a Linux Pipe. However to build and use a Langstone transceiver you do not need to know this!
+The software consists of two parts. The SDR itself uses a python GNURadio Flowgraph (Lang_TRX_Pluto.py or Lang_TRX_Hack.py) which can be created on a PC running GNUradio companion with Lang_TRX_Pluto.grc or Lang_TRX_Hack.grc. This Python program is then manually edited by adding the code from ControlTRX_Pluto.py or ControlTRX_HAck.py so it can be controlled by the GUI part of the software (LangstoneGUI_Pluto.c or LangstoneGui_Hack.c). These are written in C and communicate with GNURadio using a Linux Pipe. However to build and use a Langstone transceiver you do not need to know this!
 
 
 
@@ -70,7 +70,7 @@ The preferred installation method only needs a Windows PC connected to the same 
 
 - Make sure you use a good quality class 10 Micro-SD Card. (16GB is OK) The performance of the Raspberry Pi can be badly affected by poor quality cards. 
 
-- Connect the touchscreen display, USB mouse, USB Sound Card, and Pluto.   Power up the RPi with the new card inserted, and a network connection.  Do not connect a keyboard or HDMI display to the Raspberry Pi.
+- Connect the touchscreen display, USB mouse, USB Sound Card, and SDR Module.   Power up the RPi with the new card inserted, and a network connection.  Do not connect a keyboard or HDMI display to the Raspberry Pi.
 
 - The Rasperry Pi may restart several times as it configures the SD card. Eventually it should display a full boot on the LCD. 
 
@@ -80,10 +80,17 @@ The preferred installation method only needs a Windows PC connected to the same 
 
 - Log in (user: pi, password: raspberry) then cut and paste the following code in, one line at a time:
 
+## For the Adalm Pluto
 ```sh
-wget https://raw.githubusercontent.com/g4eml/Langstone-V3/master/install.sh
-chmod +x install.sh
-./install.sh
+wget https://raw.githubusercontent.com/g4eml/Langstone-V3/master/installPluto.sh
+chmod +x installPluto.sh
+./installPluto.sh
+```
+## For the HackRF One
+```sh
+wget https://raw.githubusercontent.com/g4eml/Langstone-V3/master/installHack.sh
+chmod +x installHack.sh
+./installHack.sh
 ```
 
 The initial build can take some time, however it does not need any user input, so go and make a cup of coffee and keep an eye on the touchscreen.  When the build is finished the Pi will reboot and should start-up with the Langstone Transceiver. Occasionally a second reboot may be required. If after this it still does not appear to be working then see the Langstone wiki for some things to look at.
