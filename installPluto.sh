@@ -78,6 +78,10 @@ chmod +x stop
 chmod +x update
 chmod +x set_pluto
 chmod +x set_sound
+chmod +x run_hack
+chmod +x stop_hack
+chmod +x run_pluto
+chmod +x stop_pluto
 
 ./build
 

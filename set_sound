@@ -19,8 +19,8 @@ select DRIVER in $SOUNDLIST
 do
  sed -i "s/audio\.source.*/audio\.source(48000, \"$DRIVER\", False)/" /home/pi/Langstone/Lang_TRX_Pluto.py
  sed -i "s/audio\.sink.*/audio\.sink(48000, \"$DRIVER\", False)/" /home/pi/Langstone/Lang_TRX_Pluto.py
- sed -i "s/audio\.source.*/audio\.source(48000, \"$DRIVER\", False)/" /home/pi/Langstone/Lang_TRX_Lime.py
- sed -i "s/audio\.sink.*/audio\.sink(48000, \"$DRIVER\", False)/" /home/pi/Langstone/Lang_TRX_Lime.py
+ sed -i "s/audio\.source.*/audio\.source(48000, \"$DRIVER\", False)/" /home/pi/Langstone/Lang_TRX_Hack.py
+ sed -i "s/audio\.sink.*/audio\.sink(48000, \"$DRIVER\", False)/" /home/pi/Langstone/Lang_TRX_Hack.py
 
  echo
  echo Langstone sound device changed to $DRIVER
