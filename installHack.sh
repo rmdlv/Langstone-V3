@@ -34,6 +34,7 @@ sudo apt-get -y install bison
 sudo apt-get -y install flex 
 sudo apt-get -y install libaio-dev
 sudo apt-get -y install libzstd-dev
+sudo apt-get -y install hackrf
 
 echo "#################################"
 echo "##        Install LibIIO       ##"
@@ -77,6 +78,12 @@ chmod +x stop
 chmod +x update
 chmod +x set_pluto
 chmod +x set_sound
+chmod +x run_hack
+chmod +x stop_hack
+chmod +x run_pluto
+chmod +x stop_pluto
+chmod +x run
+chmod +x stop
 
 ./build
 
@@ -92,6 +99,10 @@ sudo rm /etc/profile.d/sshpwd.sh
 
 
 #make Langstone autostart on boot
+
+cd Langstone
+cp run_hack run
+cp stop_hack stop
 
 if !(grep Langstone ~/.bashrc) then
   echo if test -z \"\$SSH_CLIENT\" >> ~/.bashrc 
