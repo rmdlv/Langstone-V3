@@ -33,6 +33,7 @@ void setTxFilter(int low,int high);
 void setBandBits(int b);
 void processTouch();
 void processMouse(int mbut);
+void setRotation(int rot);
 void initGUI();
 void sendFifo(char * s);
 void initFifos();
@@ -45,6 +46,7 @@ void detectHw();
 int buttonTouched(int bx,int by);
 void setKey(int k);
 void displayMenu(void);
+void showSettingsMenu(void);
 void displaySetting(int se);
 void changeSetting(void);
 void processGPIO(void);
@@ -83,6 +85,7 @@ void setFFTBW(int bw);
 
 void setDialLock(int d);
 void setBeacon(int b);
+
 int firstpass=1;
 double freq;
 double freqInc=0.001;
@@ -124,10 +127,10 @@ int lastmode=0;
 char * modename[nummode]={"USB","LSB","CW ","CWN","FM ","AM "};
 enum {USB,LSB,CW,CWN,FM,AM};
 
-#define numSettings 24
+#define numSettings 25
 
-char * settingText[numSettings]={"Rx Amp= ","Rx Gain= ","Rx Baseband= ","SSB Mic Gain= ","FM Mic Gain= ","AM Mic Gain= ","Repeater Shift= ","CTCSS= "," Rx Offset= ","Rx Harmonic Mixing= "," Tx Offset= ","Tx Harmonic Mixing= ","Band Bits (Rx)= ","Band Bits (Tx)= ","FFT Ref= ","Tx Amp= ","Tx Gain= ","S-Meter Zero= ", "SSB Rx Filter Low= ", "SSB Rx Filter High= ","CW Ident= ", "CWID Carrier= ", "CW Break-In Hang Time= ", "24 Bands= "};
-enum {RX_AMP,RX_GAIN,RX_BASE,SSB_MIC,FM_MIC,AM_MIC,REP_SHIFT,CTCSS,RX_OFFSET,RX_HARMONIC,TX_OFFSET,TX_HARMONIC,BAND_BITS_RX,BAND_BITS_TX,FFT_REF,TX_AMP,TX_GAIN,S_ZERO,SSB_FILT_LOW,SSB_FILT_HIGH,CWID,CW_CARRIER,BREAK_IN_TIME,BANDS24};
+char * settingText[numSettings]={"Rotate Screen = ","Rx Amp= ","Rx Gain= ","Rx Baseband= ","SSB Mic Gain= ","FM Mic Gain= ","AM Mic Gain= ","Repeater Shift= ","CTCSS= "," Rx Offset= ","Rx Harmonic Mixing= "," Tx Offset= ","Tx Harmonic Mixing= ","Band Bits (Rx)= ","Band Bits (Tx)= ","FFT Ref= ","Tx Amp= ","Tx Gain= ","S-Meter Zero= ", "SSB Rx Filter Low= ", "SSB Rx Filter High= ","CW Ident= ", "CWID Carrier= ", "CW Break-In Hang Time= ", "24 Bands= "};
+enum {ROTATE,RX_AMP,RX_GAIN,RX_BASE,SSB_MIC,FM_MIC,AM_MIC,REP_SHIFT,CTCSS,RX_OFFSET,RX_HARMONIC,TX_OFFSET,TX_HARMONIC,BAND_BITS_RX,BAND_BITS_TX,FFT_REF,TX_AMP,TX_GAIN,S_ZERO,SSB_FILT_LOW,SSB_FILT_HIGH,CWID,CW_CARRIER,BREAK_IN_TIME,BANDS24};
 int settingNo=RX_AMP;
 int setIndex=0;
 int maxSetIndex=10;
@@ -198,6 +201,8 @@ int rxFilterLow;
 int rxFilterHigh;
 
 int bands24 = 0;
+
+int screenrotate = 0;
 
 int keyDownTimer=0;
 int CWIDkeyDownTime=1000;                     //time to put key down between CW Idents (100 per second)
@@ -305,6 +310,7 @@ int main(int argc, char* argv[])
   initUDP();  
   lastClock=0;
   readConfig();
+  setRotation(screenrotate);
   detectHw();
   initFifos();
   initScreen();
@@ -1262,6 +1268,12 @@ void initGUI()
 }
 
 
+void setRotation(int rot)
+{
+  rotateTouch(rot);
+  rotateScreen(rot);
+}
+
 void clearWaterfall(void)
 {
   for(int r=0;r<rows;r++)
@@ -1345,7 +1357,6 @@ gotoXY(funcButtonsX,funcButtonsY);
     setForeColour(0,255,0);
     }   
   displayButton("PTT");
-
 }
 
 
@@ -2088,23 +2099,7 @@ if(inputMode==FREQ)
 if(inputMode==SETTINGS)
   {
     clearPopUp();
-    gotoXY(funcButtonsX,funcButtonsY);
-    setForeColour(0,255,0);
-    displayButton("MENU");
-    displayButton(" ");
-    displayButton("NEXT");
-    displayButton("PREV");
-    displayButton(" ");
-    setForeColour(255,0,0);
-    if (portsdownPresent==1)
-    {
-        displayButton2x12("EXIT TO","PORTSDOWN");
-    }
-    else
-    {
-        displayButton1x12("EXIT");
-    }
-    displayButton1x12("SHUTDOWN");
+    showSettingsMenu();
     mouseScroll=0;
     displaySetting(settingNo); 
   }
@@ -3061,8 +3056,41 @@ if(settingNo==BAND_BITS_TX)        // Band Bits Tx
       if(mouseScroll < 0)   bands24= 0;
       mouseScroll=0;  
       displaySetting(settingNo);  
-      }                                                                                                                    
+      }   
+      
+   if(settingNo==ROTATE)        // Rotate Screen
+      {
+      if(mouseScroll > 0)   screenrotate= 1;
+      if(mouseScroll < 0)   screenrotate= 0;
+      mouseScroll=0;
+      setRotation(screenrotate);
+      initGUI(); 
+      showSettingsMenu(); 
+      displaySetting(settingNo);  
+      }                                                                                                                 
 }
+
+
+void showSettingsMenu(void)
+  {
+    gotoXY(funcButtonsX,funcButtonsY);
+    setForeColour(0,255,0);
+    displayButton("MENU");
+    displayButton(" ");
+    displayButton("NEXT");
+    displayButton("PREV");
+    displayButton(" ");
+    setForeColour(255,0,0);
+    if (portsdownPresent==1)
+    {
+        displayButton2x12("EXIT TO","PORTSDOWN");
+    }
+    else
+    {
+        displayButton1x12("EXIT");
+    }
+    displayButton1x12("SHUTDOWN");
+  }
 
 
 void displaySetting(int se)
@@ -3298,6 +3326,18 @@ if(se==BANDS24)
         displayStr("Yes");
     }
   }
+  
+if(se==ROTATE)
+  {
+    if(screenrotate == 0)
+    {
+      displayStr("No");
+    }
+    else
+    {
+        displayStr("Yes");
+    }
+  }
 }
 
 int readConfig(void)
@@ -3406,6 +3446,7 @@ while(fscanf(conffile,"%49s %99s [^\n]\n",variable,value) !=EOF)
     if(strstr(variable,"volume")) sscanf(value,"%d",&volume);
     if(strstr(variable,"breakInTime")) sscanf(value,"%d",&breakInTime);
     if(strstr(variable,"bands24")) sscanf(value,"%d",&bands24);
+    if(strstr(variable,"RotateScreen")) sscanf(value,"%d",&screenrotate);
     if(mode>nummode-1) mode=0;
             
   }
@@ -3483,6 +3524,7 @@ fprintf(conffile,"AMMic %d\n",AMMic);
 fprintf(conffile,"volume %d\n",volume);
 fprintf(conffile,"breakInTime %d\n",breakInTime);
 fprintf(conffile,"bands24 %d\n",bands24);
+fprintf(conffile,"RotateScreen %d\n",screenrotate);
 
 fclose(conffile);
 return 0;
