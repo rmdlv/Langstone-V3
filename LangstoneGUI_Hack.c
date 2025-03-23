@@ -1808,7 +1808,15 @@ if(buttonTouched(funcButtonsX+buttonSpaceX*6,funcButtonsY))   //Button 7 = PTT  
       sendFifo("H");        //unlock the flowgraph so that it can exit
       sendFifo("Q");       //kill the SDR 
       writeConfig();
-      system("sudo cp /home/pi/Langstone/splash.bgra /dev/fb0");
+      if(screenrotate)
+      {
+        system("sudo cp /home/pi/Langstone/splash_inv.bgra /dev/fb0");
+      }
+      else
+      {
+        system("sudo cp /home/pi/Langstone/splash.bgra /dev/fb0");
+      }
+
       sleep(2);
       system("sudo poweroff");                          
       return;      

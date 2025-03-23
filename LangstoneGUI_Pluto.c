@@ -2036,7 +2036,14 @@ if(buttonTouched(funcButtonsX+buttonSpaceX*6,funcButtonsY))   //Button 7 = PTT  
       sendFifo("Q");       //kill the SDR 
       writeConfig();
       iio_context_destroy(plutoctx);
-      system("sudo cp /home/pi/Langstone/splash.bgra /dev/fb0");
+      if(screenrotate)
+      {
+        system("sudo cp /home/pi/Langstone/splash_inv.bgra /dev/fb0");
+      }
+      else
+      {
+        system("sudo cp /home/pi/Langstone/splash.bgra /dev/fb0");
+      }
       sleep(2);
       system("sudo poweroff");                          
       return;      
