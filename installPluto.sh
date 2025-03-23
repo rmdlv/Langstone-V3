@@ -111,9 +111,6 @@ fi
 
 #Configure the boot parameters
 
-if !(grep lcd_rotate /boot/firmware/config.txt) then
-  sudo sh -c "echo lcd_rotate=2 >> /boot/firmware/config.txt"
-fi
 if !(grep disable_splash /boot/firmware/config.txt) then
   sudo sh -c "echo disable_splash=1 >> /boot/firmware/config.txt"
 fi
