@@ -24,9 +24,12 @@ int backColourR=0;
 int backColourG=0;
 int backColourB=0;
 
+int rotatescreen = 0;
+
 
 void closeScreen(void);
 int initScreen(void);
+void rotateScreen(int rot);
 void setPixel(int x, int y, int R, int G, int B);
 void clearScreen();
 void displayChar(int ch);
@@ -215,6 +218,12 @@ void clearScreen()
 
 void setPixel(int x, int y, int R, int G, int B)
 {
+if(rotatescreen)
+ {
+  x=800 - x;
+  y=480 - y;
+ }
+
 if((x<800)&(y<480))
   {
   int p=(x+screenXsize*y)*4;
@@ -258,6 +267,11 @@ void closeScreen(void)
   close(fbfd);
 }
 
+
+void rotateScreen(int rot)
+{
+  rotatescreen = rot;
+}
 
 int initScreen(void)
 {

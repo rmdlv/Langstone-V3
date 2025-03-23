@@ -9,9 +9,12 @@ int tfd;
 int touchX=0;
 int touchY=0;
 
+int rotatetouch = 0;
+
 int touchAvailable();
 int getTouch();
 int initTouch(char * tpath);
+void rotateTouch(int rot);
 
 
 int initTouch(char * tpath)
@@ -53,10 +56,18 @@ int getTouch()
               else if (ev[i].type == EV_ABS && ev[i].code == 0 && ev[i].value > 0)
               {
 			          touchX = ev[i].value;
+                      if(rotatetouch)
+                       {
+                       touchX=800 - touchX;
+                       }
 		          }
                 else if (ev[i].type == EV_ABS  && ev[i].code == 1 && ev[i].value > 0)
                 {
 			            touchY = ev[i].value;
+                      if(rotatetouch)
+                       {
+                       touchY=480 - touchY;
+                       }
 		            }
 
 	       }
@@ -66,6 +77,10 @@ int getTouch()
 
 }
 
+void rotateTouch(int rot)
+{
+  rotatetouch = rot;
+}
 
 int touchAvailable()  
 {
