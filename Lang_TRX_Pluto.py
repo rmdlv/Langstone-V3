@@ -632,7 +632,7 @@ def docommands(tb):
                 break
 
 
-def main(top_block_cls=Lang_TRX_Pluto, options=None):
+def main(top_block_cls=Lang_TRX_Pluto):
     tb = top_block_cls()
     tb.start()
     docommands(tb)
