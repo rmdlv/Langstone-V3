@@ -5,25 +5,26 @@
 # Needs to be manually added into Gnu Radio Flowgraph
 ##################################################
 
-####################################################
+##################################################
 #Add these imports to the top
-#####################################################
+##################################################
  
 import os
 import errno
 
-#######################################################
+##################################################
 # Edit the AGC3 entry to read 
-##############################
+##################################################
 
         self.analog_agc3_xx_0 = analog.agc3_cc((1e-2), (5e-7), 0.1, 1.0, 1)
         self.analog_agc3_xx_0.set_max_gain(1000) 
         
                
-#######################################################
+##################################################
 # Manually add just before the Main () Function
 # to provide support for Piped commands
-#######################################################
+##################################################
+
 def docommands(tb):
   try:
     os.mkfifo("/tmp/langstoneTRx")
@@ -31,7 +32,6 @@ def docommands(tb):
     if oe.errno != errno.EEXIST:
       raise    
   ex=False
-  lastbase=0
   while not ex:
     fifoin=open("/tmp/langstoneTRx",'r')
     while True:
@@ -120,20 +120,16 @@ def docommands(tb):
               tb.set_CTCSS(value)   
            if line[0]=='W':
               value=int(line[1:])
-              tb.set_FFT_SEL(value) 
-                                                                                
-       except:
+              tb.set_FFT_SEL(value)                                                              
+       except Exception:
          break
 
-########################################################
-
-
-#########################################################
+##################################################
 #Replace the Main() function with this
-########################################################
+##################################################
+
     tb = top_block_cls()
     tb.start()
     docommands(tb)
     tb.stop()
     tb.wait()
-#########################################################
