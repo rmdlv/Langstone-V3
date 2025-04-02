@@ -424,7 +424,7 @@ blocks:
   parameters:
     affinity: ''
     alias: ''
-    amp: 1.0*ToneBurst
+    amp: 1.0 * ToneBurst
     comment: ''
     freq: '1750'
     maxoutbuf: '0'
@@ -448,7 +448,7 @@ blocks:
     alias: ''
     amp: 0.15 * (CTCSS >0)
     comment: ''
-    freq: CTCSS/10.0
+    freq: CTCSS / 10.0
     maxoutbuf: '0'
     minoutbuf: '0'
     offset: '0'
@@ -580,7 +580,7 @@ blocks:
     affinity: ''
     alias: ''
     comment: ''
-    const: (0.5 * int(Tx_Mode==5)) + int(Tx_Mode==2) +int(Tx_Mode==3)
+    const: (0.5 * int(Tx_Mode==5)) + int(Tx_Mode==2) + int(Tx_Mode==3)
     maxoutbuf: '0'
     minoutbuf: '0'
     type: float
@@ -804,7 +804,7 @@ blocks:
     affinity: ''
     alias: ''
     comment: ''
-    const: '(MicGain)*(int(Tx_Mode==0)) + (MicGain)*(int(Tx_Mode==1)) + (AMMIC/10.0)*(int(Tx_Mode==5)) '
+    const: '(MicGain) * (int(Tx_Mode==0)) + (MicGain) * int(Tx_Mode==1)) + (AMMIC / 10.0) * (int(Tx_Mode==5)) '
     maxoutbuf: '0'
     minoutbuf: '0'
     type: float
@@ -822,7 +822,7 @@ blocks:
     affinity: ''
     alias: ''
     comment: ''
-    const: FMMIC/5.0
+    const: FMMIC / 5.0
     maxoutbuf: '0'
     minoutbuf: '0'
     type: float
@@ -840,7 +840,7 @@ blocks:
     affinity: ''
     alias: ''
     comment: ''
-    const: (AFGain/100.0) *  (not Rx_Mute)
+    const: (AFGain / 100.0) * (not Rx_Mute)
     maxoutbuf: '0'
     minoutbuf: '0'
     type: float
@@ -1121,7 +1121,7 @@ blocks:
     maxoutbuf: '0'
     minoutbuf: '0'
     ref_scale: '2'
-    sample_rate: 48000/ (2 ** FFT_SEL)
+    sample_rate: 48000 / (2 ** FFT_SEL)
     shift: 'False'
     type: complex
   states:
@@ -1144,7 +1144,7 @@ blocks:
     maxoutbuf: '0'
     minoutbuf: '0'
     ref_scale: '2'
-    sample_rate: 48000/ (2** FFT_SEL)
+    sample_rate: 48000 / (2 ** FFT_SEL)
     shift: 'False'
     type: complex
   states:
