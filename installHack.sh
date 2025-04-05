@@ -107,6 +107,7 @@ cp stop_hack stop
 if !(grep Langstone ~/.bashrc) then
   echo if test -z \"\$SSH_CLIENT\" >> ~/.bashrc 
   echo then >> ~/.bashrc
+  echo "stty -echo -icanon" >> ~/.bashrc
   echo /home/pi/Langstone/run >> ~/.bashrc
   echo fi >> ~/.bashrc
 fi
