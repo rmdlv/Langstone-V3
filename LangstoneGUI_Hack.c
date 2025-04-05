@@ -10,6 +10,7 @@
 #include "Graphics.h"
 #include "Touch.h"
 #include "Mouse.h"
+#include "hmi.h"
 #include "Morse.c"
 #include <netdb.h>
 #include <netinet/in.h>                                                                                                      
@@ -33,6 +34,7 @@ void setTxFilter(int low,int high);
 void setBandBits(int b);
 void processTouch();
 void processMouse(int mbut);
+void processHmi(int hm);
 void setRotation(int rot);
 void initGUI();
 void sendFifo(char * s);
@@ -256,8 +258,10 @@ int tuneDigit=8;
 
 char mousePath[30];
 char touchPath[30];
+char hmiPath[30];
 int mousePresent;
 int touchPresent;
+int hmiPresent;
 int portsdownPresent;
 
 int popupSel=0;
@@ -319,6 +323,7 @@ int main(int argc, char* argv[])
   if(touchPresent) initTouch(touchPath);
   printf("Initialising Mouse at %s\n",mousePath);
   if(mousePresent) initMouse(mousePath);
+  if(hmiPresent) initHmi(hmiPath);
   initGUI(); 
   initSDR(); 
   //              RGB Vals   Black >  Blue  >  Green  >  Yellow   >   Red     4 gradients    //number of gradients is varaible
@@ -354,6 +359,15 @@ int main(int argc, char* argv[])
           }
        }
            
+      }
+      
+    if(hmiPresent)
+      {
+        int hr=getHmi();
+        if(hr > 0)
+          {
+          processHmi(hr);
+          }
       }
       
       
@@ -926,11 +940,12 @@ void detectHw()
   size_t len=0;
   ssize_t rd;
   int p;
-  char handler[2][20];
+  char handler[3][20];
   char * found;
   p=0;
   mousePresent=0;
   touchPresent=0;
+  hmiPresent=0;
   portsdownPresent=0;
   fp=fopen("/proc/bus/input/devices","r");
    while ((rd=getline(&ln,&len,fp)!=-1))
@@ -940,9 +955,14 @@ void detectHw()
         p=0;
         if((strstr(ln,"FT5406")!=NULL) || (strstr(ln,"pi-ts")!=NULL) || (strstr(ln,"ft5x06")!=NULL))         //Found Raspberry Pi TouchScreen entry
           {
-           p=1;
-          }                                                                  
-      }
+           p=1;                                //we have found the touchscreen
+          }
+          
+        if(strstr(ln,"C-Media")!=NULL)         //Found HMI device on the CM108 sound card
+          {
+           p=2;                                //hmi device on the sound card
+          }             
+      }     
       
       if(ln[0]=='H')        //handlers
       {
@@ -951,19 +971,28 @@ void detectHw()
            found=strstr(ln,"event");        
            strcpy(handler[p],found); 
            handler[p][strlen(found)-2] = 0;         
-           if(p==0) 
+           if(p==0)                                 //not the touch screen so assume it is a normal mouse
             {
               sprintf(mousePath,"/dev/input/%s",handler[0]);
               mousePresent=1;
               printf("Found Mouse at %s\n",mousePath); 
             }
-           if(p==1) 
+           if(p==1)                                 //touch screen 
            {
              sprintf(touchPath,"/dev/input/%s",handler[1]);
              touchPresent=1;
              printf("Found Touch at %s\n",touchPath);
            }
          }
+         if((strstr(ln,"kbd")!=NULL) && (p==2))             //found the HMI Entry for the CM108 Sound card
+         {
+           found=strstr(ln,"event");        
+           strcpy(handler[p],found); 
+           handler[p][strlen(found)-2] = 0;         
+           sprintf(hmiPath,"/dev/input/%s",handler[2]);
+           hmiPresent=1;
+           printf("Found HMI Device at %s\n",hmiPath); 
+         }       
       }   
     }
   fclose(fp);
@@ -1411,6 +1440,18 @@ for(int py=popupY;py<popupY+buttonHeight+1;py++)
 }
 popupSel=NONE;
 displayMenu();
+}
+
+void processHmi(int hm)
+{
+  if(hm==1)         //volume down button released
+    {
+      setPtts(0);
+    }
+   if(hm == 2)     //volume down button pressed
+    {
+       setPtts(1);
+    }
 }
 
                                                            
@@ -1952,10 +1993,10 @@ void setPtts(int p)
  if(p==1)
  {
   ptts=1;
-  setTx(ptt|ptts);
   gotoXY(funcButtonsX+buttonSpaceX*6,funcButtonsY);
   setForeColour(255,0,0);
   displayButton("PTT"); 
+  setTx(ptt|ptts);
  }
   else
  {
