@@ -20,7 +20,7 @@ Currently only the following hardware is supported:-
 
 - Adalm Pluto or HackRF One SDR Modules. 
 
-- USB Audio module. Connected to loudspeaker or headphones and microphone. 
+- USB Audio module. Connected to loudspeaker or headphones and microphone. Devices using the CM108 Chip can also use the Volume Down button as a PTT input. 
  
 - USB Scroll mouse
  
