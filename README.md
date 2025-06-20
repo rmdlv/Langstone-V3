@@ -14,7 +14,7 @@ Currently only the following hardware is supported:-
 
 - Raspberry Pi 5
 
-- Official Original Raspberry Pi 7" touchscreen.
+- Official Original Raspberry Pi 7" 800 x 480 Version 1 touchscreen. Note:- The newer Version 2 1280 x 720 screen is not compatible. 
 
 - RPi5 to Touchscreen flat cable. (this will need to be purchased seperately as the cable supplied with the Touch Screen is not suitable)
 
