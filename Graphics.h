@@ -213,6 +213,9 @@ void clearScreen()
 
 void setPixel(int x, int y, int R, int G, int B)
 {
+  int targetX, targetY;
+  targetX = y;
+  targetY = 720 - 1 - x;
   if (rotatescreen)
   {
     x = 720 - x;
@@ -302,8 +305,8 @@ int initScreen(void)
     return (0);
   }
 
-  screenXsize = vinfo.yres;
-  screenYsize = vinfo.xres;
+  screenXsize = vinfo.xres;
+  screenYsize = vinfo.yres;
 
   screenSize = finfo.smem_len;
   fbp = (char *)mmap(0, screenSize, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
