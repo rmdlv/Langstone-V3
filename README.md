@@ -80,13 +80,13 @@ The preferred installation method only needs a Windows PC connected to the same 
 
 ## For the Adalm Pluto
 ```sh
-wget https://raw.githubusercontent.com/g4eml/Langstone-V3/master/installPluto.sh
+wget https://raw.githubusercontent.com/rmdlv/Langstone-V3/master/installPluto.sh
 chmod +x installPluto.sh
 ./installPluto.sh
 ```
 ## For the HackRF One
 ```sh
-wget https://raw.githubusercontent.com/g4eml/Langstone-V3/master/installHack.sh
+wget https://raw.githubusercontent.com/rmdlv/Langstone-V3/master/installHack.sh
 chmod +x installHack.sh
 ./installHack.sh
 ```

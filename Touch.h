@@ -6,75 +6,74 @@
 #include <linux/input.h>
 
 int tfd;
-int touchX=0;
-int touchY=0;
+int touchX = 0;
+int touchY = 0;
 
 int rotatetouch = 0;
 
 int touchAvailable();
 int getTouch();
-int initTouch(char * tpath);
+int initTouch(char *tpath);
 void rotateTouch(int rot);
 
-
-int initTouch(char * tpath)
+int initTouch(char *tpath)
 {
-        if ((tfd = open(tpath, O_RDONLY)) < 0) 
-        {
-                printf("Touch Open failed\n");
-                return 1;
-        }
-        else
-        {
-                printf("Touch Open OK\n");
-                return 0;
-        }
+  if ((tfd = open(tpath, O_RDONLY)) < 0)
+  {
+    printf("Touch Open failed\n");
+    return 1;
+  }
+  else
+  {
+    printf("Touch Open OK\n");
+    return 0;
+  }
 }
 
-//Returns 0 if no touch available. 1 if Touch start. 2 if touch end. 3 if touch move
+// Returns 0 if no touch available. 1 if Touch start. 2 if touch end. 3 if touch move
 
 int getTouch()
 {
-	int i;
+  int i;
   size_t rb;
   struct input_event ev[64];
   int retval;
-  
-  retval=0;
-  if(touchAvailable())
+
+  retval = 0;
+  if (touchAvailable())
+  {
+    rb = read(tfd, ev, sizeof(struct input_event) * 64);
+    for (i = 0; i < (rb / sizeof(struct input_event)); i++)
     {
-    rb=read(tfd,ev,sizeof(struct input_event)*64);
-        for (i = 0;  i <  (rb / sizeof(struct input_event)); i++)
+      if (ev[i].type == EV_SYN)
+      {
+        if (retval == 0)
+          retval = 3;
+        break; // action
+      }
+      else if (ev[i].type == EV_KEY && ev[i].code == 330 && ev[i].value == 1)
+        retval = 1; // touch start
+      else if (ev[i].type == EV_KEY && ev[i].code == 330 && ev[i].value == 0)
+        retval = 2; // touch finish
+      else if (ev[i].type == EV_ABS && ev[i].code == 0 && ev[i].value > 0)
+      {
+        touchX = ev[i].value;
+        if (rotatetouch)
         {
-              if (ev[i].type ==  EV_SYN) 
-                {
-                if(retval==0) retval=3;
-                break;  //action
-                }
-              else if (ev[i].type == EV_KEY && ev[i].code == 330 && ev[i].value == 1) retval=1; //touch start
-              else if (ev[i].type == EV_KEY && ev[i].code == 330 && ev[i].value == 0) retval=2; //touch finish
-              else if (ev[i].type == EV_ABS && ev[i].code == 0 && ev[i].value > 0)
-              {
-			          touchX = ev[i].value;
-                      if(rotatetouch)
-                       {
-                       touchX=800 - touchX;
-                       }
-		          }
-                else if (ev[i].type == EV_ABS  && ev[i].code == 1 && ev[i].value > 0)
-                {
-			            touchY = ev[i].value;
-                      if(rotatetouch)
-                       {
-                       touchY=480 - touchY;
-                       }
-		            }
-
-	       }
-
+          touchX = 720 - touchX;
+        }
+      }
+      else if (ev[i].type == EV_ABS && ev[i].code == 1 && ev[i].value > 0)
+      {
+        touchY = ev[i].value;
+        if (rotatetouch)
+        {
+          touchY = 1280 - touchY;
+        }
+      }
     }
+  }
   return retval;
-
 }
 
 void rotateTouch(int rot)
@@ -82,7 +81,7 @@ void rotateTouch(int rot)
   rotatetouch = rot;
 }
 
-int touchAvailable()  
+int touchAvailable()
 {
   struct timeval tv;
   fd_set fds;
@@ -90,6 +89,6 @@ int touchAvailable()
   tv.tv_usec = 0;
   FD_ZERO(&fds);
   FD_SET(tfd, &fds);
-  select(tfd+1, &fds, NULL, NULL, &tv);
+  select(tfd + 1, &fds, NULL, NULL, &tv);
   return (FD_ISSET(tfd, &fds));
 }
