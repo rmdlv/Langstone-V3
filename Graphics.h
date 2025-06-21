@@ -215,7 +215,7 @@ void setPixel(int x, int y, int R, int G, int B)
 {
   int newx, newy;
   newx = y;
-  newy = x;
+  newy = 720 - x;
   if (rotatescreen)
   {
     newx = 720 - newx;
