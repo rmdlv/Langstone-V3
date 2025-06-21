@@ -215,11 +215,11 @@ void setPixel(int x, int y, int R, int G, int B)
 {
   if (rotatescreen)
   {
-    x = 1280 - x;
-    y = 720 - y;
+    x = 720 - x;
+    y = 1280 - y;
   }
 
-  if ((x < 1280) & (y < 720))
+  if ((x < 720) & (y < 1280))
   {
     int p = (x + screenXsize * y) * 4;
     memset(fbp + p, B, 1);        // Blue
@@ -302,8 +302,8 @@ int initScreen(void)
     return (0);
   }
 
-  screenXsize = vinfo.xres;
-  screenYsize = vinfo.yres;
+  screenXsize = vinfo.yres;
+  screenYsize = vinfo.xres;
 
   screenSize = finfo.smem_len;
   fbp = (char *)mmap(0, screenSize, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
