@@ -215,11 +215,11 @@ void setPixel(int x, int y, int R, int G, int B)
 {
   if (rotatescreen)
   {
-    x = 720 - x;
-    y = 1280 - y;
+    x = 1280 - x;
+    y = 720 - y;
   }
 
-  if ((x < 720) & (y < 1280))
+  if ((x < 1280) & (y < 720))
   {
     int p = (x + screenXsize * y) * 4;
     memset(fbp + p, B, 1);        // Blue

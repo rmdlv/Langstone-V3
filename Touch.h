@@ -60,7 +60,7 @@ int getTouch()
         touchX = ev[i].value;
         if (rotatetouch)
         {
-          touchX = 720 - touchX;
+          touchX = 1280 - touchX;
         }
       }
       else if (ev[i].type == EV_ABS && ev[i].code == 1 && ev[i].value > 0)
@@ -68,7 +68,7 @@ int getTouch()
         touchY = ev[i].value;
         if (rotatetouch)
         {
-          touchY = 1280 - touchY;
+          touchY = 720 - touchY;
         }
       }
     }
