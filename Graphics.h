@@ -221,7 +221,7 @@ void setPixel(int x, int y, int R, int G, int B)
 
   if ((x < 720) & (y < 1280))
   {
-    int p = (y + screenXsize * x) * 4;
+    int p = (x + screenXsize * y) * 4;
     memset(fbp + p, B, 1);        // Blue
     memset(fbp + p + 1, G, 1);    // Green
     memset(fbp + p + 2, R, 1);    // Red
