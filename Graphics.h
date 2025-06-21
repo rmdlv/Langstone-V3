@@ -206,7 +206,7 @@ void clearScreen()
   {
     for (int x = 0; x < screenXsize; x++)
     {
-      setPixel(x, y, backColourR, backColourG, backColourB);
+      setPixel(y, x, backColourR, backColourG, backColourB);
     }
   }
 }
@@ -215,7 +215,7 @@ void setPixel(int x, int y, int R, int G, int B)
 {
   int newx;
   int newy;
-  newx = y - 360;
+  newx = y;
   newy = 1280 - x;
   if (rotatescreen)
   {
