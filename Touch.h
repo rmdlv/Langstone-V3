@@ -55,20 +55,20 @@ int getTouch()
         retval = 1; // touch start
       else if (ev[i].type == EV_KEY && ev[i].code == 330 && ev[i].value == 0)
         retval = 2; // touch finish
-      else if (ev[i].type == EV_ABS && ev[i].code == 0 && ev[i].value > 0)
+      else if (ev[i].type == EV_ABS && ev[i].code == 1 && ev[i].value > 0)
       {
         touchX = ev[i].value;
         if (rotatetouch)
         {
-          touchX = 720 - touchX;
+          touchX = 720 - 1 - touchX;
         }
       }
-      else if (ev[i].type == EV_ABS && ev[i].code == 1 && ev[i].value > 0)
+      else if (ev[i].type == EV_ABS && ev[i].code == 0 && ev[i].value > 0)
       {
-        touchY = ev[i].value;
+        touchY = 1280 - 1 - ev[i].value;
         if (rotatetouch)
         {
-          touchY = 1280 - touchY;
+          touchY = 1280 - 1 - touchY;
         }
       }
     }
