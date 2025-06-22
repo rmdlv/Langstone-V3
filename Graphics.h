@@ -213,19 +213,15 @@ void clearScreen()
 
 void setPixel(int x, int y, int R, int G, int B)
 {
-  int newx;
-  int newy;
-  newx = y;
-  newy = 1280 - x;
   if (rotatescreen)
   {
-    newx = 720 - newx;
-    newy = 1280 - newy;
+    x = 720 - x;
+    y = 1280 - y;
   }
 
-  if ((newx < 720) & (newy < 1280))
+  if ((x < 720) & (y < 1280))
   {
-    int p = (newx + screenXsize * newy) * 4;
+    int p = (x + screenXsize * y) * 4;
     memset(fbp + p, B, 1);        // Blue
     memset(fbp + p + 1, G, 1);    // Green
     memset(fbp + p + 2, R, 1);    // Red
