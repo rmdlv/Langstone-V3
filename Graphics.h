@@ -207,7 +207,7 @@ void clearScreen()
     for (int x = 0; x < screenXsize; x++)
     {
       int newX = y;
-      int newY = 1280 - 1 - x;
+      int newY = x;
 
       setPixel(newX, newY, backColourR, backColourG, backColourB);
     }
