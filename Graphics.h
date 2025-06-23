@@ -216,8 +216,8 @@ void clearScreen()
 
 void setPixel(int x, int y, int R, int G, int B)
 {
-  int newX = y * 1.5;              // 720 / 480 = 1.5
-  int newY = (1280 - 1 - x) * 1.6; // 1280 / 800 = 1.6
+  int newX = y * 1.5;            // 720 / 480 = 1.5
+  int newY = 1280 - 1 - x * 1.6; // 1280 / 800 = 1.6
 
   if (rotatescreen)
   {
