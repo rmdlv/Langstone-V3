@@ -28,7 +28,7 @@ if !(ps -ax |grep -v grep| grep -q Lang_TRX_Pluto.py) then
    do
       (ping -c1 $PLUTO_IP 2>/dev/null |grep -q received) && break
        retry=$[${retry}+1]
-       sleep 1
+       sleep 2
    done
 
    #Check if Pluto failed to respond
